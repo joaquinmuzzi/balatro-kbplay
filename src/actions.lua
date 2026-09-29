@@ -29,6 +29,25 @@ function A.skip_blind() return ui.press(blind_on_deck_box(), "skip_blind") end
 -- only exists with Director's Cut / Retcon, above the three blinds
 function A.reroll_boss() return ui.press(G.blind_prompt_box, "reroll_boss") end
 
+-- Overlays
+
+-- The overlay we opened, so the same key closes it but never closes
+-- anything else (options, run info...).
+local deck_overlay
+
+function A.toggle_deck()
+  if G.OVERLAY_MENU then
+    if G.OVERLAY_MENU ~= deck_overlay then return false end
+    G.FUNCS.exit_overlay_menu()
+    deck_overlay = nil
+    return true
+  end
+  if G.STAGE ~= G.STAGES.RUN or not G.deck or G.SETTINGS.paused then return false end
+  G.FUNCS.deck_info()
+  deck_overlay = G.OVERLAY_MENU
+  return true
+end
+
 -- Cards
 
 ---What "Enter" means for the selected card of a single-select zone.

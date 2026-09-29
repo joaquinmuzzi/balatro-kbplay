@@ -42,6 +42,8 @@ M.defaults = {
   skip = "k", -- skip blind / skip booster pack
   reroll = "r", -- reroll shop / reroll boss
   next_round = "n", -- leave the shop
+
+  view_deck = "v", -- open / close the full deck view
 }
 
 M.OVERRIDES_FILE = "kbplay-keys.lua"

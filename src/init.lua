@@ -19,25 +19,25 @@ local function screen_name()
   end
 end
 
--- Leave the keyboard to the game while typing, in menus or mid-animation.
-local function busy(controller)
-  return controller.text_input_hook
-    or controller.locks.frame
-    or G.SETTINGS.paused
-    or G.OVERLAY_MENU
-    or not G.GAME
-    or (G.GAME.STOP_USE or 0) > 0
+-- Leave the keyboard to the game in menus or mid-animation.
+local function busy()
+  return G.SETTINGS.paused or G.OVERLAY_MENU or not G.GAME or (G.GAME.STOP_USE or 0) > 0
 end
 
 local function handle(controller, key)
-  if busy(controller) then return false end
+  if controller.text_input_hook or controller.locks.frame then return false end
+
+  local action = keymap.action_for(key, controller.held_keys)
+  if not action then return false end
+
+  -- works on any in-run screen, and closes the view it opened
+  if action == "view_deck" then return actions.toggle_deck() end
+
+  if busy() then return false end
 
   local name = screen_name()
   local screen = name and states[name]
   if not screen then return false end
-
-  local action = keymap.action_for(key, controller.held_keys)
-  if not action then return false end
 
   if focus.screen ~= name then
     focus.screen, focus.index = name, 1

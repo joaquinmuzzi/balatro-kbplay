@@ -63,7 +63,25 @@ local hovered
 local function show_tooltip(card)
   if hovered and hovered ~= card then pcall(hovered.stop_hover, hovered) end
   hovered = card
-  if card then card:hover() end
+  if not card then return end
+  card:hover()
+
+  -- The controller never ends a hover it didn't start, so watch the card and
+  -- drop its tooltip once it is deselected or leaves its area (played,
+  -- discarded, bought, sold...).
+  local area = card.area
+  G.E_MANAGER:add_event(Event {
+    blocking = false,
+    blockable = false,
+    no_delete = true,
+    func = function()
+      if hovered ~= card then return true end
+      if card.highlighted and card.area == area and not card.REMOVED then return false end
+      pcall(card.stop_hover, card)
+      hovered = nil
+      return true
+    end,
+  })
 end
 
 function M.toggle(zone, index)
