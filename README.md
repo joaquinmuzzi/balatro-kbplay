@@ -1,76 +1,81 @@
-# kbplay — Balatro con teclado
+# kbplay
 
-Mod para jugar Balatro entero con el teclado, sin tocar el mouse.
+A Balatro mod that makes the entire game playable from the keyboard, with no mouse required.
 
-> Estado: **esqueleto**. La estructura y las acciones básicas están listas; falta probarlo a fondo en el juego.
+## Installation
 
-## Instalación
+kbplay requires [Lovely](https://github.com/ethangreen-dev/lovely-injector). Steamodded is supported but not required.
 
-Solo necesita [lovely](https://github.com/ethangreen-dev/lovely-injector) (Steamodded es opcional).
+1. Install Lovely by following its instructions.
+2. Download or clone this repository into `%AppData%\Balatro\Mods\kbplay`.
+3. Launch the game. The Lovely console shows `[kbplay] loaded` once the mod is active.
 
-Copiá (o cloná) esta carpeta en `%AppData%\Balatro\Mods\kbplay`.
+### Development setup
 
-Para desarrollar, conviene un *junction* desde la carpeta de Mods al repo, así cada cambio se ve al reiniciar el juego:
+Link the repository into the Mods folder with a directory junction, so every change is picked up on the next game launch:
 
 ```bat
-mklink /J "%AppData%\Balatro\Mods\kbplay" "C:\ruta\al\repo"
+mklink /J "%AppData%\Balatro\Mods\kbplay" "C:\path\to\balatro-kbplay"
 ```
 
-## Cómo se juega
+## Controls
 
-Cada pantalla tiene **zonas** (mano, jokers, consumibles, tienda, sobre). `Tab` cambia de zona, y los números eligen cartas dentro de la zona activa.
+Each screen is divided into **zones**: hand, jokers, consumables, shop and booster pack. `Tab` moves focus between zones, and the number keys select cards within the focused zone.
 
-| Tecla | Acción |
+| Key | Action |
 |---|---|
-| `1`–`9`, `0` | marcar/desmarcar la carta N de la zona activa |
-| `Tab` / `Shift+Tab` | zona siguiente / anterior |
-| `Enter` | acción principal: jugar mano, elegir ciega, cobrar, comprar, usar, elegir del sobre |
-| `Shift+Enter` | comprar y usar (consumibles en la tienda) |
-| `D` | descartar |
-| `Supr` | vender joker/consumible seleccionado |
-| `Backspace` | desmarcar todo |
-| `Shift+←/→` | mover la carta seleccionada |
-| `Z` / `X` | ordenar la mano por número / palo |
-| `K` | saltar ciega / saltar sobre |
-| `R` | reroll de tienda / reroll de jefe (tocar, no mantener: mantener `R` reinicia la partida en el juego base) |
-| `N` | salir de la tienda (siguiente ronda) |
+| `1`–`9`, `0` | Select or deselect the Nth card in the focused zone |
+| `Tab` / `Shift+Tab` | Focus the next / previous zone |
+| `Enter` | Primary action: play hand, select blind, cash out, buy, use, or pick from a pack |
+| `Shift+Enter` | Buy and use (consumables in the shop) |
+| `D` | Discard |
+| `Delete` | Sell the selected joker or consumable |
+| `Backspace` | Deselect all |
+| `Shift+←` / `Shift+→` | Move the selected card left / right |
+| `Z` / `X` | Sort hand by rank / suit |
+| `K` | Skip blind / skip booster pack |
+| `R` | Reroll shop / reroll boss blind |
+| `N` | Leave the shop and continue to the next round |
 
-`Esc` y los menús siguen funcionando como en el juego base.
+`Esc` and all menus keep their default behavior.
 
-### Cambiar teclas
+> **Note:** tap `R` rather than holding it. Holding `R` restarts the run in the base game.
 
-Creá `%AppData%\Balatro\kbplay-keys.lua`:
+### Custom keybinds
+
+Any keybind can be changed without editing the mod. Create `%AppData%\Balatro\kbplay-keys.lua` and return the actions to override:
 
 ```lua
 return {
   discard = "q",
   sell = "ctrl+backspace",
-  sort_suit = false, -- desactiva la acción
+  sort_suit = false, -- disables the action
 }
 ```
 
-Los nombres de acciones están en [`src/keymap.lua`](src/keymap.lua); los de teclas son los de [LÖVE](https://love2d.org/wiki/KeyConstant).
+Available action names are listed in [`src/keymap.lua`](src/keymap.lua). Key names follow [LÖVE's KeyConstant](https://love2d.org/wiki/KeyConstant), and modifiers are written as `ctrl+`, `alt+` and `shift+`.
 
-## Cómo funciona
+## Architecture
 
-- [`lovely/`](lovely): registra los archivos de `src/` como módulos y carga el mod después de `G = Game()`.
-- [`src/init.lua`](src/init.lua): envuelve `Controller:key_press_update`. Si la tecla es nuestra, la maneja; si no, la deja pasar al juego.
-- [`src/ui.lua`](src/ui.lua): en vez de reimplementar reglas, **aprieta los botones del propio juego** solo cuando están habilitados. Así se respetan el dinero, los jefes, los bloqueos y otros mods.
-- [`src/zones.lua`](src/zones.lua): zonas de cartas, selección, tooltips y reordenar.
-- [`src/states.lua`](src/states.lua): qué hace cada tecla en cada pantalla (`G.STATE`).
-- [`src/actions.lua`](src/actions.lua): las acciones en sí.
+| Path | Responsibility |
+|---|---|
+| [`lovely/`](lovely) | Registers the files in `src/` as Lua modules and loads the mod right after `G = Game()` |
+| [`src/init.lua`](src/init.lua) | Wraps `Controller:key_press_update`. Bound keys are handled by the mod; all others pass through to the game |
+| [`src/states.lua`](src/states.lua) | Maps each game screen (`G.STATE`) to its zones and available actions |
+| [`src/actions.lua`](src/actions.lua) | Game actions: playing, discarding, buying, selling, rerolling and more |
+| [`src/zones.lua`](src/zones.lua) | Card zones: selection, tooltips and reordering |
+| [`src/ui.lua`](src/ui.lua) | Presses the game's own UI buttons |
+| [`src/keymap.lua`](src/keymap.lua) | Default keybinds and user overrides |
 
-Si algo falla dentro del mod, el error va a la consola de lovely y la tecla pasa al juego, así que la partida no se cae.
+### Design principles
 
-## Pendiente
+- **The game stays authoritative.** Instead of reimplementing game rules, kbplay presses the same buttons the mouse would, and only when the game has them enabled. Costs, boss blind effects, input locks and other mods' changes are respected automatically.
+- **Failures are contained.** Errors raised inside the mod are written to the Lovely console, and the key press is forwarded to the game, so a bug never crashes a run.
 
-- [ ] Probar cada pantalla en el juego (sobre todo el reroll de jefe y saltar ciega)
-- [ ] Indicador visual permanente de la zona activa y de los números sobre las cartas
-- [ ] Navegar con flechas, además de los números
-- [ ] Menú principal, nueva partida, pantalla de fin de partida
-- [ ] Ver mazo / info de la partida
-- [ ] Compatibilidad con HandyBalatro y Steamodded
+## Credits
 
-## Créditos
+Inspired by [Typist](https://github.com/kasimeka/balatro-typist-mod) by kasimeka. kbplay is an independent implementation and does not reuse its code.
 
-Idea inspirada en [Typist](https://github.com/kasimeka/balatro-typist-mod) de kasimeka. No se reutilizó su código.
+## License
+
+[MIT](LICENSE)
