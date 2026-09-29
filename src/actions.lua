@@ -35,7 +35,34 @@ function A.reroll_boss() return ui.press(G.blind_prompt_box, "reroll_boss") end
 -- anything else (options, run info...).
 local deck_overlay
 
-function A.toggle_deck()
+-- How long the deck key must be held to peek instead of opening the full view.
+local HOLD_SECONDS = 0.2
+
+local function open_deck_view()
+  G.FUNCS.deck_info()
+  deck_overlay = G.OVERLAY_MENU
+end
+
+-- The same summary the game shows while the mouse rests on the deck.
+-- Once it is gone, the game brings the play/discard buttons back by itself.
+local function show_deck_preview()
+  if G.buttons then G.buttons.states.visible = false end
+  G.deck_preview = UIBox {
+    definition = G.UIDEF.deck_preview(),
+    config = { align = "tm", offset = { x = 0, y = -0.8 }, major = G.hand, bond = "Weak" },
+  }
+end
+
+local function hide_deck_preview()
+  if not G.deck_preview then return end
+  G.deck_preview:remove()
+  G.deck_preview = nil
+end
+
+---Tap: open or close the full deck view.
+---Hold while choosing a hand: show the summary of cards left until released.
+---@param key string the physical key, to watch for its release
+function A.deck_key(key)
   if G.OVERLAY_MENU then
     if G.OVERLAY_MENU ~= deck_overlay then return false end
     G.FUNCS.exit_overlay_menu()
@@ -43,8 +70,40 @@ function A.toggle_deck()
     return true
   end
   if G.STAGE ~= G.STAGES.RUN or not G.deck or G.SETTINGS.paused then return false end
-  G.FUNCS.deck_info()
-  deck_overlay = G.OVERLAY_MENU
+
+  -- the game only has a summary while choosing a hand
+  if G.STATE ~= G.STATES.SELECTING_HAND then
+    open_deck_view()
+    return true
+  end
+
+  local pressed_at = G.TIMERS.REAL
+  local peeking = false
+  G.E_MANAGER:add_event(Event {
+    blocking = false,
+    blockable = false,
+    no_delete = true,
+    func = function()
+      if G.CONTROLLER.held_keys[key] then
+        if
+          not peeking
+          and not G.deck_preview
+          and G.STATE == G.STATES.SELECTING_HAND
+          and G.TIMERS.REAL - pressed_at >= HOLD_SECONDS
+        then
+          show_deck_preview()
+          peeking = true
+        end
+        return false
+      end
+      if peeking then
+        hide_deck_preview()
+      elseif not G.OVERLAY_MENU then
+        open_deck_view()
+      end
+      return true
+    end,
+  })
   return true
 end
 

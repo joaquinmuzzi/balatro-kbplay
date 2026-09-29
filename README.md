@@ -36,7 +36,8 @@ Each screen is divided into **zones**: hand, jokers, consumables, shop and boost
 | `K` | Skip blind / skip booster pack |
 | `R` | Reroll shop / reroll boss blind |
 | `N` | Leave the shop and continue to the next round |
-| `V` | Open / close the full deck view |
+| `V` (tap) | Open / close the full deck view |
+| `V` (hold) | While choosing a hand, show a summary of the cards left in the deck until released |
 
 `Esc` and all menus keep their default behavior.
 

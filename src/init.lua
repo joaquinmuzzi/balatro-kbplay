@@ -31,7 +31,7 @@ local function handle(controller, key)
   if not action then return false end
 
   -- works on any in-run screen, and closes the view it opened
-  if action == "view_deck" then return actions.toggle_deck() end
+  if action == "view_deck" then return actions.deck_key(key) end
 
   if busy() then return false end
 

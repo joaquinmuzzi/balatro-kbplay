@@ -43,7 +43,7 @@ M.defaults = {
   reroll = "r", -- reroll shop / reroll boss
   next_round = "n", -- leave the shop
 
-  view_deck = "v", -- open / close the full deck view
+  view_deck = "v", -- tap: full deck view / hold: summary of cards left
 }
 
 M.OVERRIDES_FILE = "kbplay-keys.lua"
