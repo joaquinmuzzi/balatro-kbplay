@@ -1,0 +1,14 @@
+[manifest]
+version = "1.0.0"
+priority = 0
+
+# Load the mod right after the global game object exists, so G.STATES,
+# G.FUNCS and the Controller class are all available.
+[[patches]]
+[patches.pattern]
+target = "globals.lua"
+pattern = "G = Game()"
+position = "after"
+payload = 'require("kbplay")'
+match_indent = true
+times = 1

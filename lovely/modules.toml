@@ -1,0 +1,47 @@
+[manifest]
+version = "1.0.0"
+priority = 0
+
+# Each source file is exposed to `require` under the given module name.
+
+[[patches]]
+[patches.module]
+source = "src/init.lua"
+before = "main.lua"
+name = "kbplay"
+
+[[patches]]
+[patches.module]
+source = "src/log.lua"
+before = "main.lua"
+name = "kbplay.log"
+
+[[patches]]
+[patches.module]
+source = "src/keymap.lua"
+before = "main.lua"
+name = "kbplay.keymap"
+
+[[patches]]
+[patches.module]
+source = "src/ui.lua"
+before = "main.lua"
+name = "kbplay.ui"
+
+[[patches]]
+[patches.module]
+source = "src/zones.lua"
+before = "main.lua"
+name = "kbplay.zones"
+
+[[patches]]
+[patches.module]
+source = "src/actions.lua"
+before = "main.lua"
+name = "kbplay.actions"
+
+[[patches]]
+[patches.module]
+source = "src/states.lua"
+before = "main.lua"
+name = "kbplay.states"
