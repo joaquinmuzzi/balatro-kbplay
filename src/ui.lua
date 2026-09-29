@@ -24,12 +24,28 @@ function M.find(box, button)
   return box and find(box.UIRoot, button)
 end
 
+-- UIElement:click is what the mouse triggers: it honours one_press,
+-- visibility and the click cooldown, and plays the button sound.
+local function click(element)
+  if not element then return false end
+  local before = element.last_clicked
+  element:click()
+  return element.last_clicked ~= before
+end
+
 ---Press it, like a mouse click would. Returns whether it was pressed.
 function M.press(box, button)
-  local element = M.find(box, button)
-  if not (element and G.FUNCS[button]) then return false end
-  G.FUNCS[button](element)
-  return true
+  return click(M.find(box, button))
+end
+
+---Same, for buttons in UIBoxes the game keeps no reference to (e.g. cash out):
+---every UIBox registers itself in G.I.UIBOX.
+function M.press_any(button)
+  for _, box in ipairs(G.I.UIBOX) do
+    local element = M.find(box, button)
+    if element then return click(element) end
+  end
+  return false
 end
 
 --[[

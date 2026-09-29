@@ -12,7 +12,7 @@ function A.discard() return ui.press(G.buttons, "discard_cards_from_highlighted"
 function A.sort_rank() return ui.press(G.buttons, "sort_hand_value") end
 function A.sort_suit() return ui.press(G.buttons, "sort_hand_suit") end
 
-function A.cash_out() return ui.press(G.round_eval, "cash_out") end
+function A.cash_out() return ui.press_any("cash_out") end
 
 function A.reroll_shop() return ui.press(G.shop, "reroll_shop") end
 function A.next_round() return ui.press(G.shop, "toggle_shop") end
@@ -26,9 +26,8 @@ end
 
 function A.select_blind() return ui.press(blind_on_deck_box(), "select_blind") end
 function A.skip_blind() return ui.press(blind_on_deck_box(), "skip_blind") end
-function A.reroll_boss()
-  return ui.press(G.blind_select_opts and G.blind_select_opts.boss, "reroll_boss")
-end
+-- only exists with Director's Cut / Retcon, above the three blinds
+function A.reroll_boss() return ui.press(G.blind_prompt_box, "reroll_boss") end
 
 -- Cards
 
