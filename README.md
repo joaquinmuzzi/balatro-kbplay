@@ -1,21 +1,21 @@
-# kbplay
+# balatro-keybinder
 
 A Balatro mod that makes the entire game playable from the keyboard, with no mouse required.
 
 ## Installation
 
-kbplay requires [Lovely](https://github.com/ethangreen-dev/lovely-injector). Steamodded is supported but not required.
+balatro-keybinder requires [Lovely](https://github.com/ethangreen-dev/lovely-injector). Steamodded is supported but not required.
 
 1. Install Lovely by following its instructions.
-2. Download or clone this repository into `%AppData%\Balatro\Mods\kbplay`.
-3. Launch the game. The Lovely console shows `[kbplay] loaded` once the mod is active.
+2. Download or clone this repository into `%AppData%\Balatro\Mods\balatro-keybinder`.
+3. Launch the game. The Lovely console shows `[balatro-keybinder] loaded` once the mod is active.
 
 ### Development setup
 
 Link the repository into the Mods folder with a directory junction, so every change is picked up on the next game launch:
 
 ```bat
-mklink /J "%AppData%\Balatro\Mods\kbplay" "C:\path\to\balatro-kbplay"
+mklink /J "%AppData%\Balatro\Mods\balatro-keybinder" "C:\path\to\balatro-balatro-keybinder"
 ```
 
 ## Controls
@@ -45,7 +45,7 @@ Each screen is divided into **zones**: hand, jokers, consumables, shop and boost
 
 ### Custom keybinds
 
-Any keybind can be changed without editing the mod. Create `%AppData%\Balatro\kbplay-keys.lua` and return the actions to override:
+Any keybind can be changed without editing the mod. Create `%AppData%\Balatro\balatro-keybinder-keys.lua` and return the actions to override:
 
 ```lua
 return {
@@ -71,12 +71,12 @@ Available action names are listed in [`src/keymap.lua`](src/keymap.lua). Key nam
 
 ### Design principles
 
-- **The game stays authoritative.** Instead of reimplementing game rules, kbplay presses the same buttons the mouse would, and only when the game has them enabled. Costs, boss blind effects, input locks and other mods' changes are respected automatically.
+- **The game stays authoritative.** Instead of reimplementing game rules, balatro-keybinder presses the same buttons the mouse would, and only when the game has them enabled. Costs, boss blind effects, input locks and other mods' changes are respected automatically.
 - **Failures are contained.** Errors raised inside the mod are written to the Lovely console, and the key press is forwarded to the game, so a bug never crashes a run.
 
 ## Credits
 
-Inspired by [Typist](https://github.com/kasimeka/balatro-typist-mod) by kasimeka. kbplay is an independent implementation and does not reuse its code.
+Inspired by [Typist](https://github.com/kasimeka/balatro-typist-mod) by kasimeka. balatro-keybinder is an independent implementation and does not reuse its code.
 
 ## License
 
